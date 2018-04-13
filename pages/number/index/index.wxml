@@ -1,0 +1,46 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="game-panel">
+    <view class="game-title">
+      数字华容道
+    </view>
+    <view class="game-layout">
+      <view class="game-type game-row">
+        <view class="game-n {{type3}} game-col-6" bindtap="set3type">小试牛刀</view>
+        <view class="game-n {{type4}} game-col-6" bindtap="set4type">最强小脑</view>
+      </view>
+      <view class="game-main game-row">
+        <view wx:for="{{numbers}}">
+          <view wx:if="{{item > 0}}" data-index="{{index}}" class="game-item game-col-{{n}}" bindtouchend="move">{{item}}</view>
+          <block wx:else>
+            <view class="game-item game-col-{{n}} blank"></view>
+          </block>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="control-panel">
+    <view wx:if="{{!isStart}}" class="game-control">
+      <view class="game-button game-start" bindtap="startGaming">{{controlBtn}}</view>
+      <view wx:if="{{isAnimation}}" class="game-hand" animation="{{animationData}}">
+          <image class="hand-shape" src="./../../../resources/images/hand-white.png"></image>
+        </view>
+    </view>
+    <block wx:else>
+      <view class="game-restart-panel">
+        <view class="game-timer">
+          <view class="game-timer-title">计时</view>
+          <view class="game-time-count">{{timeText}}</view>
+        </view>
+        <view class="game-restart" bindtap="restartGaming">
+          <image class="game-recycle" src="./../../../resources/images/restart.png"></image>
+          <text>重玩</text>
+        </view>
+      </view>
+    </block>
+  </view>
+  <!--<button type="primary" bindtap="showRanking">展示结果</button>-->
+  <!--<ranking id="ranking"></ranking>-->
+  <hover id="hover"></hover>
+  <leaderboard id="leaderboard"></leaderboard>
+</view>
