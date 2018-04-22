@@ -44,11 +44,18 @@ Page({
         self.setData({
           gameState: 1
         });
-        self.createQuestion(self.data.idioms[self.data.level].picture);
+        //self.getImage("https://www.zqdnstanley.cn/static/img/%E6%89%9B%E9%BC%8E%E6%8B%94%E5%B1%B1.jpg");
+        //self.createQuestion(self.getImageSrc(self.data.idioms[self.data.level]));
+        self.getImage(self.getImageSrc(self.data.idioms[self.data.level]));
         wx.hideLoading();
         self.startTimer();
       }
     });
+  },
+
+  getImageSrc: function(item) {
+    let question = encodeURI(item.question);
+    return `https://www.zqdnstanley.cn/static/img/${question}.jpg`;
   },
 
   // 随机生成数组
@@ -69,6 +76,7 @@ Page({
 
   // 随机生产答案
   answerInit: function(idioms) {
+    let self = this;
     if(Array.isArray(idioms) && idioms.length != 0) {
       idioms.forEach(v => {
         v.picture = `https://www.zqdnstanley.cn/static/img/${v.question}.jpg`;
@@ -249,7 +257,8 @@ Page({
     this.setData({
       pic: pic
     });
-    this.createQuestion(levelData.picture);
+    this.getImage(this.getImageSrc(levelData));
+    //this.createQuestion(levelData.picture);
     setTimeout(() =>  {
       this.setData({
         selectArr: [],
@@ -261,14 +270,47 @@ Page({
     }, 1000);
   },
 
+  // download image file before render it
+  getImage: function(imgSrc) {
+    let self = this;
+    let src = '';
+    //self.createQuestion("../../../resources/images/兵贵神速.jpg");
+    return wx.downloadFile({
+      url:imgSrc,
+      success: function(res){
+        if (res.statusCode === 200) {
+            console.log('tempFilePath:'+res.tempFilePath);
+            src = res.tempFilePath;
+            //src = src.replace('wxfile://','');
+            self.createQuestion(src);
+        }
+      }/*,
+      complete: function(res) {
+        if (res.statusCode === 200) {
+          wx.getImageInfo({
+            src: src,
+            success: function(res1){
+              console.log('tempFilePath'+res1.path)
+              self.createQuestion(res1.path);
+            }
+          })
+        }
+      }*/
+    });
+  },
+
   // 将汉字图片拆分两部分，生成题目
   createQuestion: function (imgSrc) {
+    console.log('we are creating questions:');
     var context1 = wx.createCanvasContext("myCanvas1");
     var context2 = wx.createCanvasContext("myCanvas2");
+    //console.log()
+    //imgSrc = encodeURIComponent(imgSrc);
+    console.log(imgSrc);
 
     const X = 120; // 720
     const Y = 30; // 180
-    const size = 6;
+    const size = 10;
 
     let tempX = [];
     let tempY = [];
@@ -296,11 +338,11 @@ Page({
     arrX.sort((a, b) => a - b);
     arrY.sort((a, b) => a - b);
 
+    console.log('starting drawing18.......');
     for (let i = 0; i < X; i++) {
       for (let j = 0; j < Y; j++) {
         if (arrX.indexOf(i)>=0 && arrY.indexOf(j)>=0) {
-          context1.drawImage(imgSrc, i * size, j * size, size, size, i * size * 1.25, j * size * 1.25, size * 1.25, size * 1.25)
-
+          context1.drawImage(imgSrc, i * size, j * size, size, size, i * size * 1.25, j * size * 1.25, size * 1.25, size * 1.25);
         } else {
           context2.drawImage(imgSrc, i * size, j * size, size, size, i * size * 1.25, j * size * 1.25, size * 1.25, size * 1.25);
         }
@@ -308,6 +350,7 @@ Page({
     }
     context1.draw();
     context2.draw();
+    console.log('ending drawing18.......');
   },
 
   // 判断答案是否正确
@@ -407,7 +450,7 @@ Page({
     words.forEach(v => {
       v.select = 0;
     })
-    this.createQuestion(levelData.picture);
+    this.getImage(this.getImageSrc(levelData));
     this.setData({
       selectArr: [],
       level: currentLevel,
